@@ -15,6 +15,7 @@
  */
 package com.android.launcher3.util;
 
+import static android.content.pm.PackageManager.FEATURE_SENSOR_HINGE_ANGLE;
 import static android.content.Intent.ACTION_CONFIGURATION_CHANGED;
 import static android.view.Display.DEFAULT_DISPLAY;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION;
@@ -386,6 +387,8 @@ public class DisplayController implements ComponentCallbacks, SafeCloseable {
 
         private final boolean mIsInDesktopMode;
 
+        private boolean mIsFoldable;
+
         public Info(Context displayInfoContext) {
             /* don't need system overrides for external displays */
             this(displayInfoContext, new WindowManagerProxy(), new ArrayMap<>());
@@ -406,6 +409,8 @@ public class DisplayController implements ComponentCallbacks, SafeCloseable {
             densityDpi = config.densityDpi;
             mScreenSizeDp = new PortraitSize(config.screenHeightDp, config.screenWidthDp);
             navigationMode = wmProxy.getNavigationMode(displayInfoContext);
+
+            mIsFoldable = Utilities.ATLEAST_R && displayInfoContext.getPackageManager().hasSystemFeature(FEATURE_SENSOR_HINGE_ANGLE);
 
             mPerDisplayBounds.putAll(perDisplayBoundsCache);
             List<WindowBounds> cachedValue = getCurrentBounds();
@@ -528,7 +533,10 @@ public class DisplayController implements ComponentCallbacks, SafeCloseable {
                     .reduce(0, (a, b) -> a | b);
             if (type == (flagPhone | flagTablet)) {
                 // device has profiles supporting both phone and tablet modes
-                return TYPE_MULTI_DISPLAY;
+                if (mIsFoldable) {
+                    return TYPE_MULTI_DISPLAY;
+                }
+                return TYPE_TABLET;
             } else if (type == flagTablet) {
                 // return TYPE_TABLET;
                 return TYPE_MULTI_DISPLAY;
