@@ -27,9 +27,29 @@ import kotlin.math.max
 class LawnchairWindowManagerProxy(context: Context) : WindowManagerProxy(Utilities.ATLEAST_T) {
 
     override fun estimateInternalDisplayBounds(displayInfoContext: Context): ArrayMap<CachedDisplayInfo, List<WindowBounds>> {
-        val info = getDisplayInfo(displayInfoContext).normalize(this)
-        val bounds = estimateWindowBounds(displayInfoContext, info)
-        return ArrayMap<CachedDisplayInfo, List<WindowBounds>>().apply { put(info, bounds) }
+        val result = ArrayMap<CachedDisplayInfo, List<WindowBounds>>()
+        val displayManager = displayInfoContext.getSystemService(DisplayManager::class.java) ?: return result
+
+        val displays = displayManager.displays
+
+        for (display in displays) {
+            try {
+                val contextForDisplay = displayInfoContext.createDisplayContext(display)
+                val wm = contextForDisplay.getSystemService(WindowManager::class.java)
+                val metrics = if (Utilities.ATLEAST_R) wm.maximumWindowMetrics else null
+
+                if (metrics != null) {
+                    val info = getDisplayInfo(metrics, display.rotation).normalize(this)
+                    val bounds = estimateWindowBounds(contextForDisplay, info)
+
+                    result[info] = bounds
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error estimating bounds for display ${display.displayId}", e)
+            }
+        }
+
+        return result
     }
 
     override fun getRealBounds(displayInfoContext: Context, info: CachedDisplayInfo): WindowBounds {
