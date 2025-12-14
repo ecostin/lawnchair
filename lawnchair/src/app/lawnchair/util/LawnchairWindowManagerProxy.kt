@@ -36,7 +36,7 @@ class LawnchairWindowManagerProxy(context: Context) : WindowManagerProxy(Utiliti
             try {
                 val contextForDisplay = displayInfoContext.createDisplayContext(display)
                 val wm = contextForDisplay.getSystemService(WindowManager::class.java)
-                val metrics = if (Utilities.ATLEAST_R) wm.maximumWindowMetrics else null
+                val metrics = if (Utilities.ATLEAST_R) wm?.maximumWindowMetrics else null
 
                 if (metrics != null) {
                     val info = getDisplayInfo(metrics, display.rotation).normalize(this)
