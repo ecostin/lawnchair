@@ -970,7 +970,7 @@ public class DeviceProfile {
      * necessary.
      */
     public void recalculateHotseatWidthAndBorderSpace() {
-        if (!mIsScalableGrid || isTablet)
+        if (!mIsScalableGrid)
             return;
 
         updateHotseatWidthAndBorderSpace(inv.numColumns);
