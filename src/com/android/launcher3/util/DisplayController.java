@@ -530,7 +530,8 @@ public class DisplayController implements ComponentCallbacks, SafeCloseable {
                 // device has profiles supporting both phone and tablet modes
                 return TYPE_MULTI_DISPLAY;
             } else if (type == flagTablet) {
-                return TYPE_TABLET;
+                // return TYPE_TABLET;
+                return TYPE_MULTI_DISPLAY;
             } else {
                 return TYPE_PHONE;
             }
