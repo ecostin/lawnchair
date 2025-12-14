@@ -45,7 +45,7 @@ class LawnchairWindowManagerProxy(context: Context) : WindowManagerProxy(Utiliti
                     result[info] = bounds
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error estimating bounds for display ${display.displayId}", e)
+                return result
             }
         }
 
